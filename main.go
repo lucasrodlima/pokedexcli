@@ -14,6 +14,7 @@ type cliCommand struct {
 }
 
 var cliCommands = map[string]cliCommand{
+	"help": {},
 	"exit": {
 		name:        "exit",
 		description: "Exit the Pokedex",
