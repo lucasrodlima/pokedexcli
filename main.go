@@ -13,21 +13,8 @@ func cleanInput(text string) []string {
 
 func main() {
 
-	cliCommands["help"] = cliCommand{
-		name:        "help",
-		description: "Displays a help message",
-		callback: func() error {
-			usageLines := ""
-			for _, c := range cliCommands {
-				usageLines += c.name + ": " + c.description + "\n"
-			}
-			fmt.Printf(`Welcome to the Pokedex!
-Usage:
-
-%s
-`, usageLines)
-			return nil
-		},
+	for _, c := range cliCommands {
+		helpMessage += c.name + ": " + c.description + "\n"
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)

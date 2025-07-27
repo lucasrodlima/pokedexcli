@@ -22,7 +22,11 @@ type cliCommand struct {
 var actualConfig *config
 
 var cliCommands = map[string]cliCommand{
-	"help": {},
+	"help": {
+		name:        "help",
+		description: "Displays a help message",
+		callback:    commandHelp,
+	},
 	"exit": {
 		name:        "exit",
 		description: "Exit the Pokedex",
@@ -40,6 +44,14 @@ var cliCommands = map[string]cliCommand{
 		callback:    commandMapB,
 		config:      actualConfig,
 	},
+}
+
+var helpMessage string
+
+func commandHelp() error {
+	fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
+	fmt.Println(helpMessage)
+	return nil
 }
 
 func commandExit() error {
