@@ -7,6 +7,16 @@ import (
 	"strings"
 )
 
+type locationAreas struct {
+	Count    int
+	Next     string
+	Previous string
+	Results  []struct {
+		Name string
+		Url  string
+	}
+}
+
 func cleanInput(text string) []string {
 	return strings.Fields(strings.ToLower(text))
 }
