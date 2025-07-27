@@ -12,6 +12,7 @@ func cleanInput(text string) []string {
 }
 
 func main() {
+
 	cliCommands["help"] = cliCommand{
 		name:        "help",
 		description: "Displays a help message",

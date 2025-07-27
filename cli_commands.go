@@ -7,11 +7,19 @@ import (
 	"os"
 )
 
+type config struct {
+	next     string
+	previous string
+}
+
 type cliCommand struct {
 	name        string
 	description string
 	callback    func() error
+	config      *config
 }
+
+var actualConfig *config
 
 var cliCommands = map[string]cliCommand{
 	"help": {},
@@ -22,8 +30,15 @@ var cliCommands = map[string]cliCommand{
 	},
 	"map": {
 		name:        "map",
-		description: "Show Area Locations",
+		description: "List Location Areas",
 		callback:    commandMap,
+		config:      actualConfig,
+	},
+	"mapb": {
+		name:        "mapb",
+		description: "List Previous Location Areas",
+		callback:    commandMapB,
+		config:      actualConfig,
 	},
 }
 
@@ -35,18 +50,63 @@ func commandExit() error {
 
 func commandMap() error {
 	areas := locationAreas{}
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area")
+	var url string
+
+	if actualConfig == nil {
+		url = "https://pokeapi.co/api/v2/location-area"
+	} else {
+		url = actualConfig.next
+	}
 
 	res, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("Error in poke api request: %w", err)
 	}
+
 	defer res.Body.Close()
 
 	decoder := json.NewDecoder(res.Body)
 
 	if err := decoder.Decode(&areas); err != nil {
 		return fmt.Errorf("Error decoding json: %w", err)
+	}
+
+	actualConfig = &config{
+		next:     areas.Next,
+		previous: areas.Previous,
+	}
+
+	for _, a := range areas.Results {
+		fmt.Println(a.Name)
+	}
+	return nil
+}
+
+func commandMapB() error {
+	areas := locationAreas{}
+
+	if actualConfig.previous == "" {
+		fmt.Println("you're on the first page")
+		return nil
+	}
+	url := actualConfig.previous
+
+	res, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("Error in poke api request: %w", err)
+	}
+
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if err := decoder.Decode(&areas); err != nil {
+		return fmt.Errorf("Error decoding json: %w", err)
+	}
+
+	actualConfig = &config{
+		next:     areas.Next,
+		previous: areas.Previous,
 	}
 
 	for _, a := range areas.Results {
