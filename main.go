@@ -19,11 +19,6 @@ var cliCommands = map[string]cliCommand{
 		description: "Exit the Pokedex",
 		callback:    commandExit,
 	},
-	"help": {
-		name:        "help",
-		description: "Displays a help message",
-		callback:    commandHelp,
-	},
 }
 
 func commandExit() error {
@@ -32,23 +27,28 @@ func commandExit() error {
 	return nil
 }
 
-func commandHelp() error {
-	fmt.Printf(`Welcome to the Pokedex!
-Usage:
-
-help: Displays a help message
-exit: Exit the Pokedex
-
-`)
-	return nil
-
-}
-
 func cleanInput(text string) []string {
 	return strings.Fields(strings.ToLower(text))
 }
 
 func main() {
+	cliCommands["help"] = cliCommand{
+		name:        "help",
+		description: "Displays a help message",
+		callback: func() error {
+			usageLines := ""
+			for _, c := range cliCommands {
+				usageLines += c.name + ": " + c.description + "\n"
+			}
+			fmt.Printf(`Welcome to the Pokedex!
+Usage:
+
+%s
+`, usageLines)
+			return nil
+		},
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
