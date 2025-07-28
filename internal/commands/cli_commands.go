@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -6,49 +6,49 @@ import (
 	"os"
 )
 
-var cliCommands = map[string]pokeapi.CliCommand{
+var CliCommands = map[string]pokeapi.CliCommand{
 	"help": {
 		Name:        "help",
 		Description: "Displays a help message",
-		Callback:    commandHelp,
+		Callback:    CommandHelp,
 	},
 	"exit": {
 		Name:        "exit",
 		Description: "Exit the Pokedex",
-		Callback:    commandExit,
+		Callback:    CommandExit,
 	},
 	"map": {
 		Name:        "map",
 		Description: "List Location Areas",
-		Callback:    commandMap,
+		Callback:    CommandMap,
 	},
 	"mapb": {
 		Name:        "mapb",
 		Description: "List Previous Location Areas",
-		Callback:    commandMapB,
+		Callback:    CommandMapB,
 	},
 	"explore": {
 		Name:        "explore",
 		Description: "Explore the Pokemon in area",
-		Callback:    commandExplore,
+		Callback:    CommandExplore,
 	},
 }
 
-var helpMessage string
+var HelpMessage string
 
-func commandHelp(c *pokeapi.Config, args []string) error {
+func CommandHelp(c *pokeapi.Config, args []string) error {
 	fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
-	fmt.Println(helpMessage)
+	fmt.Println(HelpMessage)
 	return nil
 }
 
-func commandExit(c *pokeapi.Config, args []string) error {
+func CommandExit(c *pokeapi.Config, args []string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandExplore(c *pokeapi.Config, args []string) error {
+func CommandExplore(c *pokeapi.Config, args []string) error {
 	fmt.Printf("Exploring %s...\n", args[0])
 	err := pokeapi.ExploreArea(c, args[0])
 	if err != nil {
@@ -58,7 +58,7 @@ func commandExplore(c *pokeapi.Config, args []string) error {
 	return nil
 }
 
-func commandMap(c *pokeapi.Config, args []string) error {
+func CommandMap(c *pokeapi.Config, args []string) error {
 	err := pokeapi.MapLocationAreas(c)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func commandMap(c *pokeapi.Config, args []string) error {
 	return nil
 }
 
-func commandMapB(c *pokeapi.Config, args []string) error {
+func CommandMapB(c *pokeapi.Config, args []string) error {
 	err := pokeapi.MapBLocationAreas(c)
 	if err != nil {
 		return err

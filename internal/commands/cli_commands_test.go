@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ func TestCommandHelp(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	commandHelp(nil)
+	CommandHelp(nil, []string{})
 
 	w.Close()
 	os.Stdout = oldStdout
@@ -46,7 +46,7 @@ func TestCommandMap(t *testing.T) {
 		Next:  server.URL,
 		Cache: pokecache.NewCache(5 * time.Second),
 	}
-	commandMap(config)
+	CommandMap(config, []string{})
 
 	w.Close()
 	os.Stdout = oldStdout
@@ -73,7 +73,7 @@ func TestCommandMapB(t *testing.T) {
 		Previous: server.URL,
 		Cache:    pokecache.NewCache(5 * time.Second),
 	}
-	commandMapB(config)
+	CommandMapB(config, []string{})
 
 	w.Close()
 	os.Stdout = oldStdout

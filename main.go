@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/lucasrodlima/pokedexcli/internal/commands"
 	"github.com/lucasrodlima/pokedexcli/internal/pokeapi"
 	"github.com/lucasrodlima/pokedexcli/internal/pokecache"
 	"os"
@@ -10,8 +11,8 @@ import (
 )
 
 func main() {
-	for _, c := range cliCommands {
-		helpMessage += c.Name + ": " + c.Description + "\n"
+	for _, c := range commands.CliCommands {
+		commands.HelpMessage += c.Name + ": " + c.Description + "\n"
 	}
 
 	mainCache := pokecache.NewCache(5 * time.Second)
@@ -32,7 +33,7 @@ func main() {
 			continue
 		}
 
-		command, ok := cliCommands[cleanedInput[0]]
+		command, ok := commands.CliCommands[cleanedInput[0]]
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
