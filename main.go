@@ -4,16 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/lucasrodlima/pokedexcli/internal/pokeapi"
+	"github.com/lucasrodlima/pokedexcli/internal/pokecache"
 	"os"
+	"time"
 )
 
 func main() {
-
 	for _, c := range cliCommands {
 		helpMessage += c.Name + ": " + c.Description + "\n"
 	}
 
-	conf := pokeapi.Config{}
+	mainCache := pokecache.NewCache(5 * time.Second)
+
+	conf := pokeapi.Config{
+		Cache: mainCache,
+	}
 
 	scanner := bufio.NewScanner(os.Stdin)
 

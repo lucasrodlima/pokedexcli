@@ -2,7 +2,10 @@ package pokeapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/lucasrodlima/pokedexcli/internal/pokecache"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -20,6 +23,7 @@ type LocationAreas struct {
 type Config struct {
 	Next     string
 	Previous string
+	Cache    *pokecache.Cache
 }
 
 type CliCommand struct {
@@ -42,17 +46,32 @@ func MapLocationAreas(c *Config) error {
 		url = c.Next
 	}
 
-	res, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("Error in poke api request: %w", err)
-	}
+	val, ok := c.Cache.Get(url)
+	if !ok {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("Error in poke api request: %w", err)
+		}
 
-	defer res.Body.Close()
+		defer res.Body.Close()
 
-	decoder := json.NewDecoder(res.Body)
+		data, err := io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
 
-	if err := decoder.Decode(&areas); err != nil {
-		return fmt.Errorf("Error decoding json: %w", err)
+		err = json.Unmarshal(data, &areas)
+		if err != nil {
+			return err
+		}
+
+		c.Cache.Add(url, data)
+
+	} else {
+		err := json.Unmarshal(val, &areas)
+		if err != nil {
+			return errors.New("Error unmarshaling cached data")
+		}
 	}
 
 	c.Next = areas.Next
@@ -74,17 +93,32 @@ func MapBLocationAreas(c *Config) error {
 	}
 	url := c.Previous
 
-	res, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("Error in poke api request: %w", err)
-	}
+	val, ok := c.Cache.Get(url)
+	if !ok {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("Error in poke api request: %w", err)
+		}
 
-	defer res.Body.Close()
+		defer res.Body.Close()
 
-	decoder := json.NewDecoder(res.Body)
+		data, err := io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
 
-	if err := decoder.Decode(&areas); err != nil {
-		return fmt.Errorf("Error decoding json: %w", err)
+		err = json.Unmarshal(data, &areas)
+		if err != nil {
+			return err
+		}
+
+		c.Cache.Add(url, data)
+
+	} else {
+		err := json.Unmarshal(val, &areas)
+		if err != nil {
+			return errors.New("Error unmarshaling cached data")
+		}
 	}
 
 	c.Next = areas.Next

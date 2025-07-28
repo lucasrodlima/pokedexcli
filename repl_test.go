@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"github.com/lucasrodlima/pokedexcli/internal/pokeapi"
+	"testing"
+)
 
 func TestCleanInput(t *testing.T) {
 
@@ -27,7 +30,7 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := cleanInput(c.input)
+		actual := pokeapi.CleanInput(c.input)
 
 		if len(actual) != len(c.expected) {
 			t.Errorf("cleanInput output length does not match expected")
