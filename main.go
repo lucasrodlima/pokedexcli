@@ -37,6 +37,6 @@ func main() {
 			fmt.Println("Unknown command")
 			continue
 		}
-		command.Callback(&conf)
+		command.Callback(&conf, cleanedInput[1:])
 	}
 }
