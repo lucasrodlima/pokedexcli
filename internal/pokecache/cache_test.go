@@ -59,3 +59,13 @@ func TestReapLoop(t *testing.T) {
 		return
 	}
 }
+
+func TestGetUnexistent(t *testing.T) {
+	const interval = 5 * time.Millisecond
+	cache := NewCache(interval)
+
+	_, ok := cache.Get("https://doesntexist.com")
+	if ok {
+		t.Errorf("unexpected entry")
+	}
+}
