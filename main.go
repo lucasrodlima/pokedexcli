@@ -3,31 +3,17 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/lucasrodlima/pokedexcli/internal/pokeapi"
 	"os"
-	"strings"
 )
-
-type locationAreas struct {
-	Count    int
-	Next     string
-	Previous string
-	Results  []struct {
-		Name string
-		Url  string
-	}
-}
-
-func cleanInput(text string) []string {
-	return strings.Fields(strings.ToLower(text))
-}
 
 func main() {
 
 	for _, c := range cliCommands {
-		helpMessage += c.name + ": " + c.description + "\n"
+		helpMessage += c.Name + ": " + c.Description + "\n"
 	}
 
-	conf := config{}
+	conf := pokeapi.Config{}
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -36,7 +22,7 @@ func main() {
 		scanner.Scan()
 		input := scanner.Text()
 
-		cleanedInput := cleanInput(input)
+		cleanedInput := pokeapi.CleanInput(input)
 		if len(cleanedInput) == 0 {
 			continue
 		}
@@ -46,6 +32,6 @@ func main() {
 			fmt.Println("Unknown command")
 			continue
 		}
-		command.callback(&conf)
+		command.Callback(&conf)
 	}
 }
