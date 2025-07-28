@@ -27,6 +27,8 @@ func main() {
 		helpMessage += c.name + ": " + c.description + "\n"
 	}
 
+	conf := config{}
+
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -44,6 +46,6 @@ func main() {
 			fmt.Println("Unknown command")
 			continue
 		}
-		command.callback()
+		command.callback(&conf)
 	}
 }

@@ -15,11 +15,8 @@ type config struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
-	config      *config
+	callback    func(*config) error
 }
-
-var actualConfig *config
 
 var cliCommands = map[string]cliCommand{
 	"help": {
@@ -36,38 +33,36 @@ var cliCommands = map[string]cliCommand{
 		name:        "map",
 		description: "List Location Areas",
 		callback:    commandMap,
-		config:      actualConfig,
 	},
 	"mapb": {
 		name:        "mapb",
 		description: "List Previous Location Areas",
 		callback:    commandMapB,
-		config:      actualConfig,
 	},
 }
 
 var helpMessage string
 
-func commandHelp() error {
+func commandHelp(c *config) error {
 	fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
 	fmt.Println(helpMessage)
 	return nil
 }
 
-func commandExit() error {
+func commandExit(c *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandMap() error {
+func commandMap(c *config) error {
 	areas := locationAreas{}
 	var url string
 
-	if actualConfig == nil {
+	if c.next == "" {
 		url = "https://pokeapi.co/api/v2/location-area"
 	} else {
-		url = actualConfig.next
+		url = c.next
 	}
 
 	res, err := http.Get(url)
@@ -83,10 +78,8 @@ func commandMap() error {
 		return fmt.Errorf("Error decoding json: %w", err)
 	}
 
-	actualConfig = &config{
-		next:     areas.Next,
-		previous: areas.Previous,
-	}
+	c.next = areas.Next
+	c.previous = areas.Previous
 
 	for _, a := range areas.Results {
 		fmt.Println(a.Name)
@@ -94,14 +87,14 @@ func commandMap() error {
 	return nil
 }
 
-func commandMapB() error {
+func commandMapB(c *config) error {
 	areas := locationAreas{}
 
-	if actualConfig.previous == "" {
+	if c.previous == "" {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	url := actualConfig.previous
+	url := c.previous
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -116,10 +109,8 @@ func commandMapB() error {
 		return fmt.Errorf("Error decoding json: %w", err)
 	}
 
-	actualConfig = &config{
-		next:     areas.Next,
-		previous: areas.Previous,
-	}
+	c.next = areas.Next
+	c.previous = areas.Previous
 
 	for _, a := range areas.Results {
 		fmt.Println(a.Name)
