@@ -42,6 +42,20 @@ var CliCommands = map[string]pokeapi.CliCommand{
 		Description: "Inspect information about caught Pokemon",
 		Callback:    commandInspect,
 	},
+	"pokedex": {
+		Name:        "pokedex",
+		Description: "List all caught Pokemon",
+		Callback:    commandPokedex,
+	},
+}
+
+func commandPokedex(c *pokeapi.Config, args []string) error {
+	fmt.Println("Your Pokedex:")
+	for name, _ := range c.Pokedex.Captured {
+		fmt.Printf("  - %s\n", name)
+	}
+
+	return nil
 }
 
 func commandInspect(c *pokeapi.Config, args []string) error {
