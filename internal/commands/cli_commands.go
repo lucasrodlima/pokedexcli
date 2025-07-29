@@ -32,9 +32,24 @@ var CliCommands = map[string]pokeapi.CliCommand{
 		Description: "Explore the Pokemon in area",
 		Callback:    CommandExplore,
 	},
+	"catch": {
+		Name:        "catch",
+		Description: "Catch a Pokemon and add it to your Pokedex",
+		Callback:    commandCatch,
+	},
 }
 
 var HelpMessage string
+
+func commandCatch(c *pokeapi.Config, args []string) error {
+	fmt.Printf("Throwing a pokeball at %s\n", args[0])
+	err := pokeapi.CatchPokemon(c, args[0])
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func CommandHelp(c *pokeapi.Config, args []string) error {
 	fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")

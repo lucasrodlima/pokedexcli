@@ -4,90 +4,59 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/lucasrodlima/pokedexcli/internal/pokecache"
 	"io"
+	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 )
-
-type exploredArea struct {
-	EncounterMethodRates []struct {
-		EncounterMethod struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"encounter_method"`
-		VersionDetails []struct {
-			Rate    int `json:"rate"`
-			Version struct {
-				Name string `json:"name"`
-				URL  string `json:"url"`
-			} `json:"version"`
-		} `json:"version_details"`
-	} `json:"encounter_method_rates"`
-	GameIndex int `json:"game_index"`
-	ID        int `json:"id"`
-	Location  struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"location"`
-	Name  string `json:"name"`
-	Names []struct {
-		Language struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"language"`
-		Name string `json:"name"`
-	} `json:"names"`
-	PokemonEncounters []struct {
-		Pokemon struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"pokemon"`
-		VersionDetails []struct {
-			EncounterDetails []struct {
-				Chance          int   `json:"chance"`
-				ConditionValues []any `json:"condition_values"`
-				MaxLevel        int   `json:"max_level"`
-				Method          struct {
-					Name string `json:"name"`
-					URL  string `json:"url"`
-				} `json:"method"`
-				MinLevel int `json:"min_level"`
-			} `json:"encounter_details"`
-			MaxChance int `json:"max_chance"`
-			Version   struct {
-				Name string `json:"name"`
-				URL  string `json:"url"`
-			} `json:"version"`
-		} `json:"version_details"`
-	} `json:"pokemon_encounters"`
-}
-
-type LocationAreas struct {
-	Count    int
-	Next     string
-	Previous string
-	Results  []struct {
-		Name string
-		Url  string
-	}
-}
-
-type Config struct {
-	Next     string
-	Previous string
-	Cache    *pokecache.Cache
-}
-
-type CliCommand struct {
-	Name        string
-	Description string
-	Callback    func(*Config, []string) error
-	Args        []string
-}
 
 func CleanInput(text string) []string {
 	return strings.Fields(strings.ToLower(text))
+}
+
+func CatchPokemon(c *Config, name string) error {
+	pokemon := Pokemon{}
+
+	url := "https://pokeapi.co/api/v2/pokemon/" + name
+
+	val, ok := c.Cache.Get(url)
+	if !ok {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("Error in poke api request: %w", err)
+		}
+
+		defer res.Body.Close()
+
+		data, err := io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(data, &pokemon)
+		if err != nil {
+			return err
+		}
+
+		c.Cache.Add(url, data)
+
+	} else {
+		err := json.Unmarshal(val, &pokemon)
+		if err != nil {
+			return errors.New("Error unmarshaling cached data")
+		}
+	}
+
+	if rand.Intn(pokemon.BaseExperience) < 50 {
+		time.Sleep(time.Second)
+		fmt.Printf("%s was captured!\n", pokemon.Name)
+	} else {
+		time.Sleep(time.Second)
+		fmt.Printf("%s escaped!\n", pokemon.Name)
+	}
+
+	return nil
 }
 
 func ExploreArea(c *Config, area string) error {
