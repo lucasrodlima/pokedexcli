@@ -37,9 +37,43 @@ var CliCommands = map[string]pokeapi.CliCommand{
 		Description: "Catch a Pokemon and add it to your Pokedex",
 		Callback:    commandCatch,
 	},
+	"inspect": {
+		Name:        "inspect",
+		Description: "Inspect information about caught Pokemon",
+		Callback:    commandInspect,
+	},
 }
 
-var HelpMessage string
+func commandInspect(c *pokeapi.Config, args []string) error {
+	pokemon, ok := c.Pokedex.Captured[args[0]]
+	if !ok {
+		fmt.Printf("%s is not caught!\n", args[0])
+		return nil
+	}
+
+	fmt.Printf(`Name: %v
+Height: %v
+Weight: %v
+Stats:
+  -hp: %v
+  -attack: %v
+  -defense: %v
+  -special-attack: %v
+  -special-defense: %v
+  -speed: %v
+Types:
+`, pokemon.Name, pokemon.Height, pokemon.Weight,
+		pokemon.Stats[0].BaseStat, pokemon.Stats[1].BaseStat,
+		pokemon.Stats[2].BaseStat, pokemon.Stats[3].BaseStat,
+		pokemon.Stats[4].BaseStat, pokemon.Stats[5].BaseStat,
+	)
+
+	for _, t := range pokemon.Types {
+		fmt.Printf("  - %s\n", t.Type.Name)
+	}
+
+	return nil
+}
 
 func commandCatch(c *pokeapi.Config, args []string) error {
 	err := pokeapi.CatchPokemon(c, args[0])
@@ -49,6 +83,8 @@ func commandCatch(c *pokeapi.Config, args []string) error {
 
 	return nil
 }
+
+var HelpMessage string
 
 func CommandHelp(c *pokeapi.Config, args []string) error {
 	fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")

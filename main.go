@@ -43,5 +43,6 @@ func main() {
 			continue
 		}
 		command.Callback(&conf, cleanedInput[1:])
+		// no error handling
 	}
 }
