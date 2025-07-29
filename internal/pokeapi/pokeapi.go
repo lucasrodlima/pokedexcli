@@ -48,12 +48,18 @@ func CatchPokemon(c *Config, name string) error {
 		}
 	}
 
-	if rand.Intn(pokemon.BaseExperience) < 50 {
+	_, ok = c.Pokedex.Captured[pokemon.Name]
+	if !ok {
+		fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
 		time.Sleep(time.Second)
-		fmt.Printf("%s was captured!\n", pokemon.Name)
+		if rand.Intn(pokemon.BaseExperience) < 50 {
+			fmt.Printf("%s was caught!\n", pokemon.Name)
+			c.Pokedex.Captured[pokemon.Name] = pokemon
+		} else {
+			fmt.Printf("%s escaped!\n", pokemon.Name)
+		}
 	} else {
-		time.Sleep(time.Second)
-		fmt.Printf("%s escaped!\n", pokemon.Name)
+		fmt.Printf("%s is already caught!\n", pokemon.Name)
 	}
 
 	return nil

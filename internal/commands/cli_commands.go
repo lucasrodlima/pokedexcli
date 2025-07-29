@@ -42,7 +42,6 @@ var CliCommands = map[string]pokeapi.CliCommand{
 var HelpMessage string
 
 func commandCatch(c *pokeapi.Config, args []string) error {
-	fmt.Printf("Throwing a pokeball at %s\n", args[0])
 	err := pokeapi.CatchPokemon(c, args[0])
 	if err != nil {
 		return err

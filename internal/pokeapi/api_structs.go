@@ -4,6 +4,10 @@ import (
 	"github.com/lucasrodlima/pokedexcli/internal/pokecache"
 )
 
+type Pokedex struct {
+	Captured map[string]Pokemon
+}
+
 type Pokemon struct {
 	Abilities []struct {
 		Ability struct {
@@ -365,6 +369,7 @@ type Config struct {
 	Next     string
 	Previous string
 	Cache    *pokecache.Cache
+	Pokedex  Pokedex
 }
 
 type CliCommand struct {

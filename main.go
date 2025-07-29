@@ -16,9 +16,13 @@ func main() {
 	}
 
 	mainCache := pokecache.NewCache(5 * time.Second)
+	mainPokedex := pokeapi.Pokedex{
+		Captured: map[string]pokeapi.Pokemon{},
+	}
 
 	conf := pokeapi.Config{
-		Cache: mainCache,
+		Cache:   mainCache,
+		Pokedex: mainPokedex,
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
